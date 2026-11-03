@@ -25,7 +25,7 @@ export function LanguageToggle({ locale }: LanguageToggleProps) {
     }
 
     startTransition(() => {
-      void fetch("/api/preferences/language", {
+      void fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/preferences/language`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
