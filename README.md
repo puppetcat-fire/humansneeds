@@ -135,6 +135,23 @@ docker run --rm -p 3000:3000 -v %cd%/data:/app/data ineedthis
 
 On Linux/macOS replace `%cd%` with `$(pwd)`.
 
+## Deployment (humansneeds.com/needs/)
+
+The app is served at <https://humansneeds.com/needs/> from the same host as the personal site, with `basePath: "/needs"` and `distDir: ".next-needs"` (see `next.config.ts`).
+
+- Live checkout: `/opt/humansneeds` is a symlink to one release directory under `/opt/humansneeds-releases/`
+- Data: `/var/lib/humansneeds-needs/data`; every release gets a `data` symlink to it, so redeploying never touches the SQLite database
+- Service: `ineedthis-needs.service`, `next start -p 3200 -H 127.0.0.1`, reverse-proxied by nginx under `/needs`
+
+Merging into `main` deploys automatically. `humansneeds-needs-deploy.timer` checks `origin/main` every two minutes, installs a fresh release directory, builds it, and only then moves the symlink and restarts the service, so the running build keeps serving during the build. If `/needs` does not answer after the restart, the symlink goes back to the previous release.
+
+```bash
+systemctl start humansneeds-needs-deploy.service   # deploy now
+journalctl -u humansneeds-needs-deploy -n 50       # what happened
+```
+
+To roll back, revert the pull request on GitHub; the next poll redeploys the reverted tree.
+
 ## Verification
 
 ```bash
