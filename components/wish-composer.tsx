@@ -100,7 +100,7 @@ export function WishComposer({
     setErrorMessage("");
 
     try {
-      const response = await fetch("/api/wishes", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/wishes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
